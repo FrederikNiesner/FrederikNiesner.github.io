@@ -1,2 +1,0 @@
-# FrederikNiesner.github.io
-Website
