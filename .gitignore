@@ -1,0 +1,50 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# InDesign Files
+*.indd
+*.idlk
+*.indt
+*.indl
+*.inx
+
+
+# CV Files (keep private)
+FN_CV_2025.md
+
+# PDF Files (keep only final versions)
+*_draft.pdf
+
+# Temporary Files
+*~
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# IDE/Editor Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Files to Ignore from files/indd/ directory
+files/indd/*.idlk
+files/indd/*~*
+
+# Keep important images but ignore working files
+!files/*.png
+!files/*.gif
+!files/*.jpg
+!files/*.jpeg
