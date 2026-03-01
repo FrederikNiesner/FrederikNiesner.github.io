@@ -16,7 +16,7 @@ html {
 }
 
 img { border: 0; }
-a { text-decoration: none; color: inherit; }
+a { text-decoration: none; color: inherit; cursor: none; }
 address { font-style: normal; }
 
 h1, h2, h3, h4, h5, h6 {
@@ -68,6 +68,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  cursor: none;
 }
 
 ::selection {
@@ -205,7 +206,7 @@ body {
   border-radius: 20px;
   color: var(--color-text);
   transition: color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
+  cursor: none;
 }
 
 .button:hover {
@@ -292,6 +293,10 @@ body {
   .cursor-dot {
     display: none;
   }
+
+  body, a, .button {
+    cursor: auto;
+  }
 }
 
 /* ===== ACCESSIBILITY: REDUCED MOTION ===== */
@@ -303,6 +308,10 @@ body {
 
   .cursor-dot {
     display: none;
+  }
+
+  body, a, .button {
+    cursor: auto;
   }
 
   *, *::before, *::after {
