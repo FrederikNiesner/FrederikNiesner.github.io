@@ -1,0 +1,4 @@
+weasyprint
+markdown
+pyyaml
+jinja2

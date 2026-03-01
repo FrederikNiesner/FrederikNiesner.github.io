@@ -15,8 +15,11 @@ Thumbs.db
 *.inx
 
 
-# CV Files (keep private)
-FN_CV_2025.md
+# CV source content (keep private)
+cv/content.md
+
+# CV generated builds
+cv/builds/
 
 # PDF Files (keep only final versions)
 *_draft.pdf
