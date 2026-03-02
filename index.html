@@ -13,7 +13,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="styles.css?v=12" type="text/css" media="all" />
+		<link rel="stylesheet" href="styles.css?v=13" type="text/css" media="all" />
 	</head>
 	<body data-mode="classic">
 		<script>
@@ -103,7 +103,17 @@
 
 				if (toggle) {
 					toggle.addEventListener('click', function() {
-						setMode(body.getAttribute('data-mode') === 'ai' ? 'classic' : 'ai');
+						if (body.classList.contains('mode-transition-out') || body.classList.contains('mode-transition-in')) return;
+						var nextMode = body.getAttribute('data-mode') === 'ai' ? 'classic' : 'ai';
+						body.classList.add('mode-transition-out');
+						setTimeout(function() {
+							body.classList.remove('mode-transition-out');
+							setMode(nextMode);
+							body.classList.add('mode-transition-in');
+							setTimeout(function() {
+								body.classList.remove('mode-transition-in');
+							}, 1200);
+						}, 1200);
 					});
 				}
 

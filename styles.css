@@ -384,7 +384,7 @@ body {
   align-items: center;
   width: 100%;
   max-width: 700px;
-  transition: opacity 0.5s ease;
+  transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .classic-content {
@@ -405,6 +405,35 @@ body[data-mode="ai"] .classic-content {
 
 body[data-mode="ai"] .ai-content {
   opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sequential: Phase 1 - fade out current */
+body.mode-transition-out[data-mode="classic"] .classic-content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.mode-transition-out[data-mode="ai"] .ai-content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sequential: Phase 2 - fade in new */
+@keyframes modeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+body.mode-transition-in[data-mode="classic"] .classic-content {
+  opacity: 0;
+  animation: modeFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  pointer-events: auto;
+}
+
+body.mode-transition-in[data-mode="ai"] .ai-content {
+  opacity: 0;
+  animation: modeFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   pointer-events: auto;
 }
 
@@ -582,6 +611,11 @@ body[data-mode="ai"] .ai-content {
   .classic-content,
   .ai-content {
     transition-duration: 0.01ms;
+  }
+
+  body.mode-transition-in[data-mode="classic"] .classic-content,
+  body.mode-transition-in[data-mode="ai"] .ai-content {
+    animation-duration: 0.01ms;
   }
 
   .cursor-dot {
