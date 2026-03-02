@@ -13,11 +13,13 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="styles.css" type="text/css" media="all" />
+		<link rel="stylesheet" href="styles.css?v=2" type="text/css" media="all" />
 	</head>
 	<body>
 
 		<div class="cursor-dot" aria-hidden="true"></div>
+
+		<img src="files/indd/name_gif_white_2x.gif" alt="Frederik" class="name-thumbnail" width="29" height="29">
 
 		<main class="module-contact">
 			<div class="info-container">
@@ -38,7 +40,7 @@
 				<div class="social-container anim-fade" style="--delay: 3">
 					<a href="https://www.linkedin.com/in/frederikniesner" class="button font-tiny" target="_blank" rel="noopener noreferrer">LK</a>
 					<a href="https://github.com/frederikniesner" class="button font-tiny" target="_blank" rel="noopener noreferrer">GH</a>
-					<a href="files/FN_CV_2026.pdf" class="button font-tiny" target="_blank" rel="noopener noreferrer">CV</a>
+					<a href="cv/builds/FN_CV_2026.pdf" class="button font-tiny" target="_blank" rel="noopener noreferrer">CV</a>
 				</div>
 
 				<footer class="anim-fade" style="--delay: 4">
@@ -54,6 +56,8 @@
 				if (isTouch || !dot) return;
 
 				var mx = 0, my = 0, dx = 0, dy = 0;
+				// Safari uses a faster easing to match Chrome's perceived responsiveness
+				var ease = navigator.vendor === 'Apple Computer, Inc.' ? 0.28 : 0.15;
 
 				document.addEventListener('mousemove', function(e) {
 					mx = e.clientX;
@@ -66,8 +70,8 @@
 				});
 
 				function render() {
-					dx += (mx - dx) * 0.15;
-					dy += (my - dy) * 0.15;
+					dx += (mx - dx) * ease;
+					dy += (my - dy) * ease;
 					dot.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
 					requestAnimationFrame(render);
 				}
