@@ -15,8 +15,13 @@ Thumbs.db
 *.inx
 
 
+# Python
+.venv/
+
 # CV source content (keep private)
 cv/content.md
+cv/content copy.md
+cv/FN_CV_DeepMind_Gemini_Integrated_Assistance_v1.md
 FN_CV_2025.md
 
 # CV generated builds (allow PDF for website)

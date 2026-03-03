@@ -19,10 +19,9 @@ This is a minimalist personal website that works seamlessly across all devices a
 ```
 ├── index.html          # Main website page
 ├── styles.css          # Primary stylesheet
-├── styles2.css         # Additional styling
-├── FN_CV_2024.pdf     # Resume/CV download
-├── CNAME              # Custom domain configuration
-└── files/             # Assets and images
+├── CNAME               # Custom domain configuration
+├── cv/                 # CV build pipeline (generate.py → builds/FN_CV_2026.pdf)
+└── files/              # Assets and images
 ```
 
 ## Deployment
