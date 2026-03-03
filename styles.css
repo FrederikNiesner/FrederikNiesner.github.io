@@ -57,6 +57,7 @@ input:focus, textarea:focus, select:focus {
 html {
   background-color: var(--color-bg);
   overscroll-behavior-y: none;
+  cursor: none;
 }
 
 body {
@@ -370,7 +371,7 @@ body {
   border: 1px solid var(--color-text);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
+  cursor: none;
   -webkit-tap-highlight-color: transparent;
   transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
@@ -561,7 +562,7 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
 }
 
 .ai-prompt-input:disabled {
-  cursor: not-allowed;
+  cursor: none;
   opacity: 0.9;
 }
 
@@ -584,7 +585,7 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
   color: rgba(242, 242, 242, 0.8);
   font-family: var(--font-sans);
   font-size: 12px;
-  cursor: not-allowed;
+  cursor: none;
   border-radius: 8px;
   transition: color 0.2s ease, background-color 0.2s ease;
 }
@@ -665,7 +666,7 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
     display: none;
   }
 
-  body, a, .button {
+  html, body, a, .button, .mode-toggle, .ai-prompt-btn, .ai-prompt-input {
     cursor: auto;
   }
 }
@@ -696,7 +697,7 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
     display: none;
   }
 
-  body, a, .button {
+  html, body, a, .button, .mode-toggle, .ai-prompt-btn, .ai-prompt-input {
     cursor: auto;
   }
 
