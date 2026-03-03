@@ -25,15 +25,16 @@
 		<img src="files/indd/name_gif_white_2x.gif" alt="Frederik" class="name-thumbnail" width="29" height="29">
 
 		<div class="mode-toggle-wrapper">
+			<span class="mode-toggle-label font-tiny">AI Mode Beta</span>
 			<button type="button" class="mode-toggle" role="switch" aria-checked="false" aria-label="AI Mode Beta" title="AI Mode Beta">
 				<span class="mode-toggle-thumb">
 					<svg class="mode-toggle-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.2 3.6L17 7l-3.8 1.2L12 12l-1.2-3.8L7 7l3.8-1.2L12 2zm-4 14l.6 1.8 1.8.6-1.8.6-.6 1.8-.6-1.8-1.8-.6 1.8-.6.6-1.8zm8 0l.6 1.8 1.8.6-1.8.6-.6 1.8-.6-1.8-1.8-.6 1.8-.6.6-1.8z"/></svg>
 				</span>
 			</button>
-			<span class="mode-toggle-label font-tiny">AI Mode Beta</span>
 		</div>
 
 		<main class="module-contact">
+			<div class="grid-hover" aria-hidden="true"></div>
 			<div class="info-container">
 				<div class="mode-switcher">
 					<div class="classic-content">
@@ -87,6 +88,61 @@
 
 		<script>
 			(function() {
+				var container = document.querySelector('.grid-hover');
+				if (!container || window.matchMedia('(prefers-reduced-motion: reduce)').matches || 'ontouchstart' in window) return;
+
+				var gridSize = 32;
+				var pool = [];
+				var poolSize = 25;
+				var lastCol = -1, lastRow = -1;
+
+				for (var i = 0; i < poolSize; i++) {
+					var cell = document.createElement('span');
+					cell.className = 'grid-hover-cell';
+					pool.push(cell);
+				}
+
+				function showCell(col, row) {
+					if (col === lastCol && row === lastRow) return;
+					lastCol = col;
+					lastRow = row;
+					if (pool.length === 0) return;
+
+					var cell = pool.pop();
+					cell.style.setProperty('--col', col);
+					cell.style.setProperty('--row', row);
+					cell.classList.remove('active');
+					container.appendChild(cell);
+					cell.offsetHeight;
+					cell.classList.add('active');
+				}
+
+				function returnToPool(cell) {
+					cell.classList.remove('active');
+					cell.remove();
+					pool.push(cell);
+				}
+
+				document.addEventListener('mousemove', function(e) {
+					var col = Math.floor(e.clientX / gridSize);
+					var row = Math.floor(e.clientY / gridSize);
+					if (col >= 0 && row >= 0) showCell(col, row);
+				});
+
+				document.addEventListener('mouseleave', function() {
+					lastCol = -1;
+					lastRow = -1;
+				});
+
+				container.addEventListener('animationend', function(e) {
+					if (e.target.classList.contains('grid-hover-cell') && e.animationName === 'gridHoverFade') {
+						returnToPool(e.target);
+					}
+				});
+			})();
+		</script>
+		<script>
+			(function() {
 				var STORAGE_KEY = 'frederikniesner-mode';
 				var body = document.body;
 				var toggle = document.querySelector('.mode-toggle');
@@ -105,6 +161,7 @@
 					toggle.addEventListener('click', function() {
 						if (body.classList.contains('mode-transition-out') || body.classList.contains('mode-transition-in')) return;
 						var nextMode = body.getAttribute('data-mode') === 'ai' ? 'classic' : 'ai';
+						toggle.setAttribute('aria-checked', nextMode === 'ai');
 						body.classList.add('mode-transition-out');
 						setTimeout(function() {
 							body.classList.remove('mode-transition-out');
@@ -112,8 +169,8 @@
 							body.classList.add('mode-transition-in');
 							setTimeout(function() {
 								body.classList.remove('mode-transition-in');
-							}, 1200);
-						}, 1200);
+							}, 1500);
+						}, 1500);
 					});
 				}
 

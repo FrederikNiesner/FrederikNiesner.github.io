@@ -169,12 +169,81 @@ body {
 .module-contact .info-container .contact-container {
   display: flex;
   flex-direction: column;
+  margin-top: 28px;
+}
+
+.module-contact .info-container {
+  position: relative;
+  z-index: 1;
 }
 
 .module-contact .info-container .social-container {
   display: flex;
   justify-content: center;
   gap: 8px;
+}
+
+/* ===== GRID GLOW (BACKGROUND) ===== */
+.grid-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.grid-glow-cell {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  left: calc(32px * var(--col, 0));
+  top: calc(32px * var(--row, 0));
+  animation: gridGlow var(--duration, 5s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.grid-glow-pink {
+  background-color: rgba(241, 141, 152, 0.55);
+}
+
+.grid-glow-green {
+  background-color: rgba(0, 216, 144, 0.5);
+}
+
+.grid-glow-yellow {
+  background-color: rgba(251, 239, 146, 0.5);
+}
+
+@keyframes gridGlow {
+  0%, 100% { opacity: 0; }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+}
+
+/* ===== GRID HOVER (MOUSE TRAIL) ===== */
+.grid-hover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.grid-hover-cell {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  left: calc(32px * var(--col, 0));
+  top: calc(32px * var(--row, 0));
+  background-color: rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  animation: gridHoverFade 0.9s ease-out 0.12s forwards;
+}
+
+@keyframes gridHoverFade {
+  0% { opacity: 0; }
+  25% { opacity: 0.4; }
+  60% { opacity: 0.4; }
+  100% { opacity: 0; }
 }
 
 /* ===== LINKS & BUTTONS ===== */
@@ -273,8 +342,8 @@ body {
 /* ===== NAME THUMBNAIL ===== */
 .name-thumbnail {
   position: fixed;
-  top: 24px;
-  left: 24px;
+  top: 32px;
+  left: 32px;
   width: 29px;
   height: auto;
   z-index: 100;
@@ -284,12 +353,12 @@ body {
 /* ===== MODE TOGGLE ===== */
 .mode-toggle-wrapper {
   position: fixed;
-  top: 24px;
-  right: 24px;
+  top: 32px;
+  right: 32px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   z-index: 100;
 }
 
@@ -384,7 +453,7 @@ body {
   align-items: center;
   width: 100%;
   max-width: 700px;
-  transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .classic-content {
@@ -427,13 +496,13 @@ body.mode-transition-out[data-mode="ai"] .ai-content {
 
 body.mode-transition-in[data-mode="classic"] .classic-content {
   opacity: 0;
-  animation: modeFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: modeFadeIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   pointer-events: auto;
 }
 
 body.mode-transition-in[data-mode="ai"] .ai-content {
   opacity: 0;
-  animation: modeFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: modeFadeIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   pointer-events: auto;
 }
 
@@ -567,14 +636,14 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
   }
 
   .name-thumbnail {
-    top: 16px;
-    left: 16px;
+    top: 32px;
+    left: 32px;
     width: 24px;
   }
 
   .mode-toggle-wrapper {
-    top: 16px;
-    right: 16px;
+    top: 32px;
+    right: 32px;
   }
 
   .mode-toggle-label {
@@ -603,6 +672,11 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
 
 /* ===== ACCESSIBILITY: REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
+  .grid-glow,
+  .grid-hover {
+    display: none;
+  }
+
   .anim-fade {
     animation: none;
     opacity: 1;

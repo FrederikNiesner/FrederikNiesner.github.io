@@ -143,8 +143,18 @@
 
 				if (toggle) {
 					toggle.addEventListener('click', function() {
+						if (body.classList.contains('mode-transition-out') || body.classList.contains('mode-transition-in')) return;
 						var nextMode = body.getAttribute('data-mode') === 'ai' ? 'classic' : 'ai';
-						setMode(nextMode);
+						toggle.setAttribute('aria-checked', nextMode === 'ai');
+						body.classList.add('mode-transition-out');
+						setTimeout(function() {
+							body.classList.remove('mode-transition-out');
+							setMode(nextMode);
+							body.classList.add('mode-transition-in');
+							setTimeout(function() {
+								body.classList.remove('mode-transition-in');
+							}, 1500);
+						}, 1500);
 					});
 				}
 
