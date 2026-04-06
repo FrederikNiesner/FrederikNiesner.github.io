@@ -1,12 +1,10 @@
 name: Deploy fred-ai-proxy
 
+# Manual only: avoids a failing check on every push before Cloudflare secrets exist.
+# After adding CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and (optional) GEMINI_API_KEY,
+# run this workflow from the Actions tab.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "worker/**"
-      - ".github/workflows/deploy-fred-ai-proxy.yml"
 
 jobs:
   deploy:
