@@ -550,13 +550,6 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
   gap: 16px;
 }
 
-.ai-conversation:empty::before {
-  content: "Start a conversation — ask about Fred's experience, skills, or projects.";
-  color: rgba(242, 242, 242, 0.5);
-  font-size: 14px;
-  font-style: italic;
-}
-
 .ai-message {
   font-size: 14px;
   line-height: 22px;
@@ -578,6 +571,14 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
   color: rgba(242, 242, 242, 0.7);
   font-style: italic;
   border-left-color: rgba(242, 242, 242, 0.4);
+}
+
+.ai-message-model.ai-message-error {
+  border-left-color: var(--color-pink);
+  color: rgba(242, 242, 242, 0.95);
+  background: rgba(241, 141, 152, 0.14);
+  padding: 10px 12px;
+  border-radius: 0 10px 10px 0;
 }
 
 .ai-prompt-body {
