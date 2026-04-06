@@ -806,6 +806,123 @@ body.mode-transition-in[data-mode="ai"] .ai-content {
   opacity: 1;
 }
 
+/* ===== 404 PAGE ===== */
+body.page-404 {
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+}
+
+body.page-404,
+body.page-404 a {
+  cursor: auto;
+}
+
+/* Do not set position:relative here — it would override .module-contact’s fixed
+   fullscreen layer and shrink the raster to content height. */
+.module-404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
+  text-align: center;
+}
+
+.module-404 .error-404-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.error-pixel-art {
+  flex-shrink: 0;
+  transform-origin: center center;
+}
+
+.error-pixel-grid {
+  --cell: 32px;
+  position: relative;
+  width: calc(17 * var(--cell));
+  height: calc(7 * var(--cell));
+  display: grid;
+  grid-template-columns: repeat(17, var(--cell));
+  grid-template-rows: repeat(7, var(--cell));
+}
+
+.error-pixel-cell {
+  grid-row: var(--r);
+  grid-column: var(--c);
+  width: var(--cell);
+  height: var(--cell);
+  margin: 0;
+  background-color: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 0 0 1px rgba(65, 100, 255, 0.12);
+}
+
+.error-pixel-cell--accent {
+  background-color: rgba(241, 141, 152, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(65, 100, 255, 0.1);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.error-404-home-link {
+  margin-top: 28px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(242, 242, 242, 0.45);
+  padding-bottom: 2px;
+  transition: color 0.35s ease, border-color 0.35s ease;
+}
+
+.error-404-home-link:hover {
+  color: var(--color-pink);
+  border-bottom-color: var(--color-pink);
+}
+
+.error-404-home-link:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+@media (max-width: 640px) {
+  .error-pixel-art {
+    transform: scale(0.62);
+  }
+
+  .error-404-home-link {
+    margin-top: 22px;
+  }
+}
+
+@media (max-width: 400px) {
+  .error-pixel-art {
+    transform: scale(0.52);
+  }
+}
+
 /* ===== CURSOR DOT ===== */
 .cursor-dot {
   position: fixed;
