@@ -18,6 +18,9 @@ Thumbs.db
 # Python
 .venv/
 
+# fred-ai: full system prompt + CV facts (upload to Worker KV; not public)
+fred-context.local.md
+
 # CV source content (keep private)
 cv/content.md
 cv/content copy.md

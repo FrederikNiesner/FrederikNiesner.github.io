@@ -61,6 +61,29 @@ body {
   text-decoration: none;
 }
 
+.cv-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 8pt;
+  line-height: 1.5;
+}
+
+.cv-contact .cv-linkedin {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.cv-contact .cv-linkedin img {
+  height: 1em;
+  width: auto;
+  display: block;
+}
+
 /* ===== SECTIONS ===== */
 h2 {
   font-family: "DM Sans", sans-serif;
@@ -159,7 +182,12 @@ li {
 <header class="cv-header">
   <div class="cv-name">{{ first_name }}<br>{{ last_name }}</div>
   <div class="cv-contact">
-    <a href="https://{{ website }}">{{ website }}</a><br>
+    <div class="cv-contact-row">
+      <a href="https://{{ website }}">{{ website }}</a>
+      <a class="cv-linkedin" href="https://www.linkedin.com/in/{{ linkedin }}" aria-label="LinkedIn profile" title="LinkedIn">
+        <img src="assets/linkedin-logo.png" alt="">
+      </a>
+    </div>
     <a href="mailto:{{ email }}">{{ email }}</a><br>
     <a href="https://maps.app.goo.gl/vU2j4uw1qQUXr7Lk7">{{ location }}</a>
   </div>

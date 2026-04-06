@@ -257,20 +257,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 var PROXY_URL_DEFAULT='https://fred-ai-proxy.frederik-niesner.workers.dev';
 var PROXY_URL=(function(){try{var u=localStorage.getItem('frederikniesner-ai-proxy-url');if(u){u=String(u).trim();if(/^https:\/\//i.test(u))return u;}}catch(e){}return PROXY_URL_DEFAULT;}());
 function proxyReady(){return PROXY_URL&&!/FILL-IN/i.test(PROXY_URL);}
-var CONTEXT_URL='/fred-context.md';
-var cachedContext=null;
 var conversationHistory=[];
-
-function fetchContext(){
-  if(cachedContext)return Promise.resolve(cachedContext);
-  return fetch(CONTEXT_URL).then(function(r){
-    if(!r.ok)throw new Error('Could not load knowledge base ('+r.status+').');
-    return r.text();
-  }).then(function(t){
-    cachedContext=t;
-    return t;
-  });
-}
 
 function buildContents(q){
   var c=[];
@@ -302,8 +289,8 @@ function getSelectedModel(){
   return v||'gemini-2.5-flash';
 }
 
-function askGemini(q,sys){
-  var body={model:getSelectedModel(),system_instruction:{parts:[{text:sys}]},contents:buildContents(q)};
+function askGemini(q){
+  var body={model:getSelectedModel(),contents:buildContents(q)};
   return fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
   .then(function(r){
     return r.text().then(function(raw){return parseGeminiResponse(r,raw);});
@@ -358,9 +345,7 @@ function handleSubmit(ev){
   input.disabled=true;
   if(submit)submit.disabled=true;
   if(modelSel)modelSel.disabled=true;
-  fetchContext().then(function(sys){
-    return askGemini(q,sys);
-  }).then(function(ans){
+  askGemini(q).then(function(ans){
     conversationHistory.push({role:'model',text:ans});
     if (typeof gtag === 'function') gtag('event', 'ai_reply_success');
     if(loadingEl){

@@ -85,8 +85,12 @@ def generate():
     pdf_build_path = os.path.join(BUILDS_DIR, f"{filename}.pdf")
     pdf_live_path = os.path.join(FILES_DIR, f"{filename}.pdf")
 
+    # HTML is saved under builds/; use ../assets/ for browser preview. PDF uses base_url=cv/ below.
+    rendered_html_on_disk = rendered.replace(
+        'src="assets/linkedin-logo.png"', 'src="../assets/linkedin-logo.png"'
+    )
     with open(html_path, "w", encoding="utf-8") as f:
-        f.write(rendered)
+        f.write(rendered_html_on_disk)
 
     HTML(string=rendered, base_url=SCRIPT_DIR).write_pdf(pdf_build_path)
 

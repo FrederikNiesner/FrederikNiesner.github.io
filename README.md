@@ -21,7 +21,9 @@ This is a minimalist personal website that works seamlessly across all devices a
 ```
 ├── index.html          # Main website page
 ├── styles.css          # Primary stylesheet
-├── fred-context.md     # fred-ai knowledge base (CV + projects)
+├── fred-context.md     # Public stub (AI context is in Worker KV)
+├── fred-context.example.md  # Template shape for your private copy
+├── fred-context.local.md   # Your real prompt (gitignored; upload to KV — see worker/README)
 ├── js/
 │   └── fred-ai.js      # fred-ai prompt bar logic (Gemini API)
 ├── eval/

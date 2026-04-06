@@ -2,6 +2,28 @@
 
 The Gemini API blocks direct browser requests (CORS). This Worker proxies requests so your site can call Gemini from the frontend.
 
+It also **injects the system instruction**: the browser sends only `contents` (chat turns). The full prompt lives in **Workers KV** (`fred_context_md`) so it is not shipped in the public git bundle or read from GitHub Pages.
+
+## AI context (required: Workers KV)
+
+Without this, chat returns **503** (“context not available”).
+
+1. **Create a KV namespace** (once):
+   ```bash
+   cd worker
+   npx wrangler kv namespace create fred-ai-context
+   ```
+2. **Uncomment** the `FRED_CONTEXT_KV` block in [`wrangler.toml`](wrangler.toml) and set `id` to the value Wrangler printed.
+3. **Redeploy** the Worker (`npm run deploy`).
+4. **Upload** your private markdown (maintain [`fred-context.local.md`](../fred-context.local.md) on your machine; it is gitignored):
+   ```bash
+   cd worker
+   npx wrangler kv key put fred_context_md --path=../fred-context.local.md --binding=FRED_CONTEXT_KV
+   ```
+   After edits, run step 4 again to refresh KV (or use `wrangler kv key put` with `--path` whenever you change the file).
+
+You can use a **second** KV namespace for rate limits (see below); keep both `[[kv_namespaces]]` entries in `wrangler.toml`.
+
 ## Deploy (one-time setup)
 
 **Important:** Run these commands in your terminal (not via Cursor) so you can answer the interactive prompt.
