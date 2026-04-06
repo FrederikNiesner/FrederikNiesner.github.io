@@ -61,3 +61,28 @@ Then open **Actions → Deploy fred-ai-proxy → Run workflow** (the workflow is
 ## Cost
 
 Cloudflare Workers free tier: 100,000 requests/day.
+
+## Staying on free tiers (personal site)
+
+- **Gemini:** Prefer a Google AI Studio key on a project **without** pay-as-you-go billing, so quota exhaustion returns errors instead of unexpected charges. Check [Google AI pricing](https://ai.google.dev/pricing) from time to time.
+- **Cloudflare Workers:** Typical portfolio traffic stays within the free tier; see [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/). Optional **KV** used for rate limits has its own free allotment.
+- **Abuse:** This Worker allows browser calls only from **frederikniesner.com** / **www**. Optional KV caps reduce quota burn if the Worker URL is shared.
+
+## Rate limits (optional Workers KV)
+
+Without KV, only **body size** (96 KB max) and **CORS** apply. To add **daily** caps (defaults: 400 global, 40 per IP, UTC day):
+
+1. Create a namespace:
+   ```bash
+   cd worker
+   npx wrangler kv namespace create fred-ai-rate-limit
+   ```
+2. Add to `wrangler.toml` (use the `id` Wrangler prints):
+   ```toml
+   [[kv_namespaces]]
+   binding = "RATE_LIMIT_KV"
+   id = "YOUR_NAMESPACE_ID"
+   ```
+3. Redeploy (GitHub Action or `npm run deploy`).
+
+Tune limits by editing constants at the top of `index.js`.

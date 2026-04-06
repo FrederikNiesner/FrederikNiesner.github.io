@@ -286,7 +286,9 @@ function parseGeminiResponse(r,raw){
     throw new Error(snippet?'Bad response from assistant.':'Could not read assistant response.');
   }
   if(!r.ok){
-    var msg=(d&&d.error&&(typeof d.error==='string'?d.error:d.error.message))||('Request failed'+(r.status?' ('+r.status+')':''));
+    if(r.status===429)throw new Error('Too many requests today. Please try again tomorrow.');
+    if(r.status===413)throw new Error('Message too long for the assistant.');
+    var msg=(d&&d.error&&(typeof d.error==='string'?d.error:d.error.message))||(d&&d.error&&typeof d.error==='object'&&d.error.message)||('Request failed'+(r.status?' ('+r.status+')':''));
     throw new Error(msg);
   }
   var text=d&&d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text;

@@ -4,3 +4,9 @@ compatibility_date = "2024-01-01"
 
 [vars]
 # GEMINI_API_KEY is set as encrypted secret: wrangler secret put GEMINI_API_KEY
+
+# Optional: KV for daily rate limits (see worker/README). Uncomment and set id after
+#   npx wrangler kv namespace create fred-ai-rate-limit
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT_KV"
+# id = ""
