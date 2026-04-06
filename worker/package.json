@@ -1,0 +1,11 @@
+{
+  "name": "fred-ai-proxy",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "secret": "wrangler secret put GEMINI_API_KEY"
+  },
+  "devDependencies": {
+    "wrangler": "^3.91.0"
+  }
+}

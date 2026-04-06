@@ -250,8 +250,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 		</script>
 		<script>
 (function(){
-// Set this to your Cloudflare Worker URL after deploying (see worker/README)
-var PROXY_URL='https://fred-ai-proxy.FILL-IN.workers.dev';
+// After deploy: set default below OR in DevTools once:
+// localStorage.setItem('frederikniesner-ai-proxy-url','https://fred-ai-proxy.YOUR-SUBDOMAIN.workers.dev')
+var PROXY_URL_DEFAULT='https://fred-ai-proxy.FILL-IN.workers.dev';
+var PROXY_URL=(function(){try{var u=localStorage.getItem('frederikniesner-ai-proxy-url');if(u){u=String(u).trim();if(/^https:\/\//i.test(u))return u;}}catch(e){}return PROXY_URL_DEFAULT;}());
+function proxyReady(){return PROXY_URL&&!/FILL-IN/i.test(PROXY_URL);}
 var CONTEXT_URL='/fred-context.md';
 var cachedContext=null;
 var conversationHistory=[];
@@ -329,11 +332,11 @@ function handleSubmit(ev){
   if(!input||!container)return;
   var q=(input.value||'').trim();
   if(!q)return;
-  if(!PROXY_URL||/FILL-IN/i.test(PROXY_URL)){
+  if(!proxyReady()){
     conversationHistory.push({role:'user',text:q});
     appendMessage('user',q);
     var stub=appendMessage('model','Thinking...',true);
-    showModelError(stub,new Error('Assistant is not configured yet (proxy URL missing).'));
+    showModelError(stub,new Error('Assistant is not configured yet: set PROXY_URL_DEFAULT in index.html or localStorage key frederikniesner-ai-proxy-url (see worker/README).'));
     input.value='';
     container.scrollTop=container.scrollHeight;
     return;

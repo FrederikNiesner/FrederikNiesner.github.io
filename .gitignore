@@ -43,6 +43,10 @@ dist/
 build/
 .cache/
 
+# Cloudflare Worker (local deps only; source is tracked)
+worker/node_modules/
+worker/.wrangler/
+
 # IDE/Editor Files
 .vscode/
 .idea/

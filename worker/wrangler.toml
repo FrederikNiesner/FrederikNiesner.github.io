@@ -1,0 +1,6 @@
+name = "fred-ai-proxy"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# GEMINI_API_KEY is set as encrypted secret: wrangler secret put GEMINI_API_KEY
