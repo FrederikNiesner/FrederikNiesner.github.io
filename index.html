@@ -13,7 +13,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="styles.css?v=14" type="text/css" media="all" />
+		<link rel="stylesheet" href="styles.css?v=19" type="text/css" media="all" />
 	</head>
 	<body data-mode="classic">
 		<script>
@@ -55,15 +55,17 @@
 							<span class="ai-prompt-placeholder">Ask Fred anything...</span>
 							<span class="ai-prompt-brand" aria-hidden="true">✦</span>
 						</div>
-						<div class="ai-prompt-body">
-							<textarea class="ai-prompt-input" readonly disabled placeholder="AI mode — work in progress. Functionality coming soon."></textarea>
-						</div>
-						<div class="ai-prompt-footer">
-							<button type="button" class="ai-prompt-btn" aria-label="Add attachment" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+						<div id="ai-conversation" class="ai-conversation"></div>
+						<form id="ai-form" class="ai-prompt-body">
+							<textarea id="ai-input" class="ai-prompt-input" name="question" placeholder="Ask about Fred's experience, skills, or projects..." rows="3"></textarea>
+							<div class="ai-prompt-footer">
+								<button type="button" id="ai-submit" class="ai-prompt-btn ai-prompt-send" aria-label="Send question">Send</button>
+								<button type="button" class="ai-prompt-btn" aria-label="Add attachment" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
 							<button type="button" class="ai-prompt-btn" aria-label="Tools" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="2"/><circle cx="16" cy="16" r="2"/><path d="M10 8l4 4M14 16l4 4"/></svg><span>Tools</span></button>
 							<button type="button" class="ai-prompt-btn ai-prompt-dropdown" aria-label="Response speed" disabled><span>Fast</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
 							<button type="button" class="ai-prompt-btn" aria-label="Voice input" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg></button>
-						</div>
+							</div>
+						</form>
 					</div>
 				</div>
 				</div>
@@ -80,11 +82,47 @@
 				</div>
 
 				<footer class="anim-fade" style="--delay: 4">
-					<p class="legal font-tiny">&copy; 2026, All Rights Reserved</p>
+					<p class="legal font-tiny">&copy; 2026 <button type="button" class="legal-link font-tiny" id="consent-settings">Cookies</button></p>
 				</footer>
 				</div>
 			</div>
 		</main>
+
+		<div id="consent-banner" class="consent-banner" role="dialog" aria-modal="true" aria-labelledby="consent-heading" hidden>
+			<div class="consent-card">
+				<div class="consent-card-head">
+					<p id="consent-heading" class="consent-heading">Hey! We use cookies to improve the user experience</p>
+					<span class="consent-cookie-icon" aria-hidden="true">
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4.5" y="6.5" width="15" height="11" rx="5.5" ry="5.5"/><circle cx="9.5" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="11.8" cy="14.8" r="0.85" fill="currentColor" stroke="none"/></svg>
+					</span>
+				</div>
+				<div class="consent-card-actions">
+					<button type="button" id="consent-decline" class="consent-btn consent-btn-ghost">Deny</button>
+					<a href="privacy.html" class="consent-btn consent-btn-ghost">Read</a>
+					<button type="button" id="consent-accept" class="consent-btn consent-btn-primary">Accept</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+(function(){
+var G='G-SPYXMVPJ8S'; /* GA4 Measurement ID, e.g. G-abc1d2e3f4 */
+var K='frederikniesner-analytics-consent',done=false,b=document.getElementById('consent-banner'),a=document.getElementById('consent-accept'),d=document.getElementById('consent-decline'),s=document.getElementById('consent-settings'),prev=null;
+function ok(){return G&&/^G-[A-Z0-9]+$/i.test(G);}
+function get(){try{return localStorage.getItem(K);}catch(e){return null;}}
+function put(v){try{localStorage.setItem(K,v);}catch(e){}}
+function deny(){if(typeof gtag==='function')gtag('consent','update',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});}
+function load(){if(!ok()||done)return;done=true;window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;
+gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('js',new Date());gtag('config',G);
+var x=document.createElement('script');x.async=true;x.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(G);document.head.appendChild(x);}
+function hide(){if(!b)return;b.hidden=true;b.setAttribute('aria-hidden','true');if(prev&&prev.focus)try{prev.focus();}catch(e){}prev=null;}
+function show(){if(!b)return;prev=document.activeElement;b.hidden=false;b.removeAttribute('aria-hidden');if(d&&d.focus)d.focus();}
+function accept(){put('granted');load();hide();}
+function decline(){put('denied');deny();hide();}
+function init(){if(get()==='granted'&&ok())load();if(get()!=='granted'&&get()!=='denied')show();if(a)a.onclick=accept;if(d)d.onclick=decline;if(s)s.onclick=show;if(b)b.onkeydown=function(e){if(e.key==='Escape'){e.preventDefault();decline();}};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+		</script>
 
 		<script>
 			(function() {
@@ -166,6 +204,7 @@
 						setTimeout(function() {
 							body.classList.remove('mode-transition-out');
 							setMode(nextMode);
+							if (typeof gtag === 'function') gtag('event', 'mode_toggle', { mode: nextMode });
 							body.classList.add('mode-transition-in');
 							setTimeout(function() {
 								body.classList.remove('mode-transition-in');
@@ -208,6 +247,83 @@
 				}
 				render();
 			})();
+		</script>
+		<script>
+(function(){
+// Set this to your Cloudflare Worker URL after deploying (see worker/README)
+var PROXY_URL='https://fred-ai-proxy.FILL-IN.workers.dev';
+var CONTEXT_URL='/fred-context.md';
+var cachedContext=null;
+var conversationHistory=[];
+
+function fetchContext(){
+  if(cachedContext)return Promise.resolve(cachedContext);
+  return fetch(CONTEXT_URL).then(function(r){if(!r.ok)throw new Error('Failed to load knowledge base');return r.text();}).then(function(t){cachedContext=t;return t;});
+}
+
+function buildContents(q){
+  var c=[];
+  for(var i=0;i<conversationHistory.length;i++){var m=conversationHistory[i];c.push({role:m.role,parts:[{text:m.text}]});}
+  c.push({role:'user',parts:[{text:q}]});
+  return c;
+}
+
+function askGemini(q,sys){
+  var body={system_instruction:{parts:[{text:sys}]},contents:buildContents(q)};
+  return fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(function(r){return r.json().then(function(d){if(!r.ok){var msg=(d&&d.error&&(typeof d.error==='string'?d.error:d.error.message))||'API error';throw new Error(msg);}return d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts&&d.candidates[0].content.parts[0]&&d.candidates[0].content.parts[0].text||'';});});
+}
+
+function appendMessage(role,text,loading){
+  var el=document.getElementById('ai-conversation');
+  if(!el)return null;
+  var div=document.createElement('div');
+  div.className='ai-message ai-message-'+role+(loading?' ai-loading':'');
+  div.textContent=text||'Thinking...';
+  el.appendChild(div);
+  el.scrollTop=el.scrollHeight;
+  return div;
+}
+
+function handleSubmit(ev){
+  if(ev){ev.preventDefault();ev.stopPropagation();}
+  var input=document.getElementById('ai-input');
+  var container=document.getElementById('ai-conversation');
+  if(!input||!container)return;
+  var q=(input.value||'').trim();
+  if(!q)return;
+  input.value='';
+  conversationHistory.push({role:'user',text:q});
+  appendMessage('user',q);
+  var loadingEl=appendMessage('model','Thinking...',true);
+  var submit=document.getElementById('ai-submit');
+  input.disabled=true;
+  if(submit)submit.disabled=true;
+  fetchContext().then(function(sys){
+    return askGemini(q,sys);
+  }).then(function(ans){
+    conversationHistory.push({role:'model',text:ans});
+    if (typeof gtag === 'function') gtag('event', 'ai_reply_success');
+    if(loadingEl){loadingEl.textContent=ans;loadingEl.classList.remove('ai-loading');}
+  }).catch(function(err){
+    if(loadingEl)loadingEl.remove();
+    appendMessage('model','Sorry, something went wrong: '+(err.message||'Unknown error'));
+  }).finally(function(){
+    input.disabled=false;
+    if(submit)submit.disabled=false;
+    container.scrollTop=container.scrollHeight;
+  });
+}
+
+function init(){
+  var form=document.getElementById('ai-form');
+  var submit=document.getElementById('ai-submit');
+  if(submit){submit.onclick=function(e){handleSubmit(e);};}
+  if(form){form.onsubmit=function(e){e.preventDefault();handleSubmit(e);};}
+}
+
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+})();
 		</script>
 	</body>
 </html>
