@@ -6,7 +6,9 @@
  * Optional: bind KV as RATE_LIMIT_KV (see worker/README) for daily caps.
  */
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_MODEL_DEFAULT = 'gemini-2.5-flash';
+/** Models the proxy may call; client may send { model } (stripped before forwarding to Gemini). */
+const ALLOWED_GEMINI_MODELS = new Set([GEMINI_MODEL_DEFAULT]);
 
 const MAX_BODY_BYTES = 96 * 1024;
 const MAX_REQUESTS_GLOBAL_PER_DAY = 400;
@@ -122,7 +124,11 @@ export default {
       }
       const body = JSON.parse(new TextDecoder().decode(buf));
 
-      const url = `${GEMINI_URL}?key=${apiKey}`;
+      const requested = typeof body.model === 'string' ? body.model.trim() : '';
+      const model = ALLOWED_GEMINI_MODELS.has(requested) ? requested : GEMINI_MODEL_DEFAULT;
+      delete body.model;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
