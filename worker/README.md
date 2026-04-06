@@ -56,7 +56,7 @@ Add these **repository secrets** (Settings → Secrets and variables → Actions
 | `CLOUDFLARE_ACCOUNT_ID` | Required with API token |
 | `GEMINI_API_KEY` | Optional; if set, synced to the Worker on each workflow run |
 
-Then push a change under `worker/` or run the **Deploy fred-ai-proxy** workflow manually. After a successful run, update `PROXY_URL_DEFAULT` or `localStorage` as in step 5.
+Then open **Actions → Deploy fred-ai-proxy → Run workflow** (the workflow is manual-only so pushes stay green until secrets exist). After a successful run, update `PROXY_URL_DEFAULT` or `localStorage` as in step 5.
 
 ## Cost
 
