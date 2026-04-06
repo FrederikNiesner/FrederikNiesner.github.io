@@ -252,7 +252,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
 // After deploy: set default below OR in DevTools once:
 // localStorage.setItem('frederikniesner-ai-proxy-url','https://fred-ai-proxy.YOUR-SUBDOMAIN.workers.dev')
-var PROXY_URL_DEFAULT='https://fred-ai-proxy.FILL-IN.workers.dev';
+var PROXY_URL_DEFAULT='https://fred-ai-proxy.frederik-niesner.workers.dev';
 var PROXY_URL=(function(){try{var u=localStorage.getItem('frederikniesner-ai-proxy-url');if(u){u=String(u).trim();if(/^https:\/\//i.test(u))return u;}}catch(e){}return PROXY_URL_DEFAULT;}());
 function proxyReady(){return PROXY_URL&&!/FILL-IN/i.test(PROXY_URL);}
 var CONTEXT_URL='/fred-context.md';
