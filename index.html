@@ -13,11 +13,11 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="styles.css?v=26" type="text/css" media="all" />
+		<link rel="stylesheet" href="styles.css?v=27" type="text/css" media="all" />
 	</head>
 	<body data-mode="classic">
 		<script>
-			(function(){try{var m=localStorage.getItem('frederikniesner-mode');if(m==='ai'||m==='classic')document.body.setAttribute('data-mode',m);}catch(e){}})();
+			(function(){try{var K='frederikniesner-mode';var p=new URLSearchParams(window.location.search);var u=p.get('mode');if(u==='ai'||u==='classic'){localStorage.setItem(K,u);document.body.setAttribute('data-mode',u);p.delete('mode');var q=p.toString();var c=location.pathname+(q?'?'+q:'')+location.hash;if(history.replaceState)history.replaceState(null,'',c||location.pathname);return;}var m=localStorage.getItem(K);if(m==='ai'||m==='classic')document.body.setAttribute('data-mode',m);}catch(e){}})();
 		</script>
 
 		<div class="cursor-dot" aria-hidden="true"></div>

@@ -84,6 +84,47 @@ body {
   display: block;
 }
 
+.cv-hint {
+  font-size: 8pt;
+  color: var(--gray);
+  line-height: 1.5;
+  margin: 0 0 12pt 0;
+  font-weight: 400;
+}
+
+.cv-hint em {
+  font-style: italic;
+}
+
+.cv-hint .cv-hint-site {
+  color: var(--gray);
+  font-style: italic;
+  text-decoration: none;
+  border-bottom: 1px solid #cccccc;
+}
+
+.cv-gemini-link {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0;
+  line-height: 1;
+  text-decoration: none;
+  border: 0;
+  position: relative;
+  top: -0.05em;
+}
+
+.cv-gemini-link svg {
+  display: block;
+  height: 1em;
+  width: 1em;
+}
+
+/* Keep full stop + Gemini mark on one line in PDF engines that break oddly */
+.cv-hint-join {
+  white-space: nowrap;
+}
+
 /* ===== SECTIONS ===== */
 h2 {
   font-family: "DM Sans", sans-serif;
@@ -192,6 +233,8 @@ li {
     <a href="https://maps.app.goo.gl/vU2j4uw1qQUXr7Lk7">{{ location }}</a>
   </div>
 </header>
+
+<p class="cv-hint"><em>To save some time, you can use my <a class="cv-hint-site" href="https://www.frederikniesner.com/">new AI tool</a> for additional questions. Give it a try<span class="cv-hint-join"> <a class="cv-gemini-link" href="https://www.frederikniesner.com/?mode=ai" aria-label="Open frederikniesner.com in AI mode" title="AI mode (Gemini)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="cvGemGrad" x1="22%" y1="100%" x2="78%" y2="0%"><stop offset="0%" stop-color="#4B88FF"/><stop offset="100%" stop-color="#A178F9"/></linearGradient></defs><path fill="url(#cvGemGrad)" d="M12 1.6l2.1 4.8 5.2.7-3.8 3.7.9 5.2-4.4-2.3-4.4 2.3.9-5.2-3.8-3.7 5.2-.7L12 1.6z"/></svg></a></span></em></p>
 
 {{ content }}
 
