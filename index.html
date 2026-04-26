@@ -13,7 +13,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="styles.css?v=27" type="text/css" media="all" />
+		<link rel="stylesheet" href="styles.css?v=28" type="text/css" media="all" />
 	</head>
 	<body data-mode="classic">
 		<script>
@@ -52,12 +52,15 @@
 				<div class="ai-content" aria-hidden="true">
 					<div class="ai-prompt-window">
 						<div class="ai-prompt-header">
-							<span class="ai-prompt-placeholder">Ask Fred anything...</span>
-							<span class="ai-prompt-brand" aria-hidden="true">✦</span>
+							<div class="ai-prompt-header-inner">
+								<span class="ai-prompt-placeholder">Fred — background &amp; projects</span>
+								<span class="ai-prompt-brand" aria-hidden="true">✦</span>
+							</div>
+							<p class="ai-scope-hint">Answers from Fred’s site context only — not open-web search, coding help, or other topics. Use the email link in Classic mode for anything else.</p>
 						</div>
 						<div id="ai-conversation" class="ai-conversation"></div>
 						<form id="ai-form" class="ai-prompt-body">
-							<textarea id="ai-input" class="ai-prompt-input" name="question" placeholder="Ask about Fred's experience, skills, or projects..." rows="3"></textarea>
+							<textarea id="ai-input" class="ai-prompt-input" name="question" placeholder="Ask about experience, skills, or projects in the context…" rows="3" maxlength="12000" autocomplete="off"></textarea>
 							<div class="ai-prompt-footer">
 								<button type="button" id="ai-submit" class="ai-prompt-btn ai-prompt-send" aria-label="Send question">Send</button>
 								<label class="ai-prompt-model-wrap">
@@ -257,13 +260,20 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 var PROXY_URL_DEFAULT='https://fred-ai-proxy.frederik-niesner.workers.dev';
 var PROXY_URL=(function(){try{var u=localStorage.getItem('frederikniesner-ai-proxy-url');if(u){u=String(u).trim();if(/^https:\/\//i.test(u))return u;}}catch(e){}return PROXY_URL_DEFAULT;}());
 function proxyReady(){return PROXY_URL&&!/FILL-IN/i.test(PROXY_URL);}
+var MAX_MESSAGE_CHARS=12000;
+var MAX_STORED_MESSAGES=20;
 var conversationHistory=[];
 
-function buildContents(q){
-  var c=[];
-  for(var i=0;i<conversationHistory.length;i++){var m=conversationHistory[i];c.push({role:m.role,parts:[{text:m.text}]});}
-  c.push({role:'user',parts:[{text:q}]});
-  return c;
+function buildContents(){
+  return conversationHistory.map(function(m){
+    return {role:m.role,parts:[{text:m.text}]};
+  });
+}
+
+function trimHistory(){
+  if(conversationHistory.length>MAX_STORED_MESSAGES){
+    conversationHistory.splice(0,conversationHistory.length-MAX_STORED_MESSAGES);
+  }
 }
 
 function parseGeminiResponse(r,raw){
@@ -289,8 +299,8 @@ function getSelectedModel(){
   return v||'gemini-2.5-flash';
 }
 
-function askGemini(q){
-  var body={model:getSelectedModel(),contents:buildContents(q)};
+function askGemini(){
+  var body={model:getSelectedModel(),contents:buildContents()};
   return fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
   .then(function(r){
     return r.text().then(function(raw){return parseGeminiResponse(r,raw);});
@@ -327,6 +337,11 @@ function handleSubmit(ev){
   if(!input||!container)return;
   var q=(input.value||'').trim();
   if(!q)return;
+  if(q.length>MAX_MESSAGE_CHARS){
+    appendMessage('model','Message is too long. Please use at most '+MAX_MESSAGE_CHARS+' characters.',false,true);
+    container.scrollTop=container.scrollHeight;
+    return;
+  }
   if(!proxyReady()){
     conversationHistory.push({role:'user',text:q});
     appendMessage('user',q);
@@ -345,8 +360,9 @@ function handleSubmit(ev){
   input.disabled=true;
   if(submit)submit.disabled=true;
   if(modelSel)modelSel.disabled=true;
-  askGemini(q).then(function(ans){
+  askGemini().then(function(ans){
     conversationHistory.push({role:'model',text:ans});
+    trimHistory();
     if (typeof gtag === 'function') gtag('event', 'ai_reply_success');
     if(loadingEl){
       loadingEl.textContent=ans;

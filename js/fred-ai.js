@@ -5,9 +5,16 @@
  *
  * Proxy URL: set PROXY_URL_DEFAULT below, or override with
  * localStorage key frederikniesner-ai-proxy-url (https only), or window.__FRED_AI_PROXY_URL__ before this script loads.
+ *
+ * `buildContents` mirrors the Worker: full `conversationHistory` is sent (user message already
+ * pushed before the request; no duplicate last user turn). Keep MAX_* in sync with worker/index.js.
  */
 
 const PROXY_URL_DEFAULT = 'https://fred-ai-proxy.frederik-niesner.workers.dev';
+
+/** Kept in sync with worker: MAX_TEXT_CHARS_PER_PART / MAX_CONTENT_MESSAGES */
+const MAX_MESSAGE_CHARS = 12_000;
+const MAX_STORED_MESSAGES = 20;
 
 const conversationHistory = [];
 
@@ -33,19 +40,17 @@ function proxyReady() {
   return Boolean(u && !/FILL-IN/i.test(u));
 }
 
-function buildContents(userQuestion) {
-  const contents = [];
-  for (const msg of conversationHistory) {
-    contents.push({
-      role: msg.role,
-      parts: [{ text: msg.text }],
-    });
+function buildContents() {
+  return conversationHistory.map((msg) => ({
+    role: msg.role,
+    parts: [{ text: msg.text }],
+  }));
+}
+
+function trimHistory() {
+  if (conversationHistory.length > MAX_STORED_MESSAGES) {
+    conversationHistory.splice(0, conversationHistory.length - MAX_STORED_MESSAGES);
   }
-  contents.push({
-    role: 'user',
-    parts: [{ text: userQuestion }],
-  });
-  return contents;
 }
 
 function getSelectedModel() {
@@ -77,11 +82,11 @@ function parseGeminiResponse(res, raw) {
   return String(text);
 }
 
-async function askGemini(userQuestion) {
+async function askGemini() {
   const proxyUrl = resolveProxyUrl();
   const body = {
     model: getSelectedModel(),
-    contents: buildContents(userQuestion),
+    contents: buildContents(),
   };
 
   const res = await fetch(proxyUrl, {
@@ -136,6 +141,16 @@ async function handleSubmit(e) {
 
   const question = (input.value || '').trim();
   if (!question) return;
+  if (question.length > MAX_MESSAGE_CHARS) {
+    appendMessage(
+      'model',
+      `Message is too long. Please use at most ${MAX_MESSAGE_CHARS} characters.`,
+      false,
+      true
+    );
+    container.scrollTop = container.scrollHeight;
+    return;
+  }
 
   if (!proxyReady()) {
     conversationHistory.push({ role: 'user', text: question });
@@ -160,8 +175,9 @@ async function handleSubmit(e) {
   setLoading(true);
 
   try {
-    const answer = await askGemini(question);
+    const answer = await askGemini();
     conversationHistory.push({ role: 'model', text: answer });
+    trimHistory();
     if (loadingEl) {
       loadingEl.textContent = answer;
       loadingEl.classList.remove('ai-loading');

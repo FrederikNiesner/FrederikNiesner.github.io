@@ -4,6 +4,10 @@ The Gemini API blocks direct browser requests (CORS). This Worker proxies reques
 
 It also **injects the system instruction**: the browser sends only `contents` (chat turns). The full prompt lives in **Workers KV** (`fred_context_md`) so it is not shipped in the public git bundle or read from GitHub Pages.
 
+## Request limits (Worker)
+
+The proxy does **not** pass through arbitrary Gemini fields. The browser may send `model` and `contents` (text only). The Worker enforces: **CORS** allowlist, optional **rate limits** (if KV is bound), **max body 96 KB**, at most **20** chat messages, **12 000** characters per text part, and server-defined **`generationConfig`** and **`safetySettings`**. Sync client defaults with [`worker/index.js`](../worker/index.js) (constants at top).
+
 ## AI context (required: Workers KV)
 
 Without this, chat returns **503** (“context not available”).

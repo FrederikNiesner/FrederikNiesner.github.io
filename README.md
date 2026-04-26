@@ -27,7 +27,7 @@ This is a minimalist personal website that works seamlessly across all devices a
 ├── js/
 │   └── fred-ai.js      # fred-ai prompt bar logic (Gemini API)
 ├── eval/
-│   ├── run-evals.js    # 10 test Q&A pairs, pass/fail scoring
+│   ├── run-evals.js    # in-scope + refusal evals, keyword / scope heuristics
 │   └── eval-results.md # Logged eval scores
 ├── CNAME               # Custom domain configuration
 ├── cv/                 # CV build pipeline (generate.py → builds/FN_CV_2026.pdf)

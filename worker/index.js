@@ -20,6 +20,22 @@ const MAX_BODY_BYTES = 96 * 1024;
 const MAX_REQUESTS_GLOBAL_PER_DAY = 400;
 const MAX_REQUESTS_PER_IP_PER_DAY = 40;
 
+/** Max chat turns stored in the client; older turns dropped before the API call. */
+const MAX_CONTENT_MESSAGES = 20;
+/** Longest single user/model text segment (defense-in-depth; client enforces the same). */
+const MAX_TEXT_CHARS_PER_PART = 12_000;
+
+const GEMINI_MAX_OUTPUT_TOKENS = 1024;
+const GEMINI_TEMPERATURE = 0.45;
+const GEMINI_TOP_P = 0.95;
+
+const DEFAULT_SAFETY_SETTINGS = [
+  { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+];
+
 const ALLOWED_ORIGINS = new Set(['https://www.frederikniesner.com', 'https://frederikniesner.com']);
 
 /** In-memory cache to reduce KV reads (~5 min). */
@@ -97,6 +113,67 @@ async function loadSystemInstructionText(env) {
   return contextKvCache.text;
 }
 
+/**
+ * Accepts only `user` / `model` text turns; no tools, no inline data. Strips and rebuilds
+ * a minimal request body so the client cannot override generationConfig, tools, or safety.
+ * @param {unknown} raw
+ * @returns {{ ok: true, contents: object[] } | { ok: false, error: string }}
+ */
+function sanitizeContentsForGemini(raw) {
+  if (!Array.isArray(raw)) {
+    return { ok: false, error: 'Request must include a "contents" array' };
+  }
+  const windowed = raw.length > MAX_CONTENT_MESSAGES ? raw.slice(-MAX_CONTENT_MESSAGES) : raw;
+  const out = [];
+  for (let i = 0; i < windowed.length; i += 1) {
+    const item = windowed[i];
+    if (!item || typeof item !== 'object') {
+      return { ok: false, error: 'Invalid message in "contents"' };
+    }
+    const { role, parts } = item;
+    if (role !== 'user' && role !== 'model') {
+      return { ok: false, error: 'Each message must have role "user" or "model"' };
+    }
+    if (!Array.isArray(parts) || parts.length === 0) {
+      return { ok: false, error: 'Each message must have a non-empty "parts" array' };
+    }
+    const newParts = [];
+    for (const p of parts) {
+      if (!p || typeof p !== 'object') {
+        return { ok: false, error: 'Invalid part in a message' };
+      }
+      if (p.functionCall != null || p.functionResponse != null) {
+        return { ok: false, error: 'Function calling is not supported' };
+      }
+      if (p.executableCode != null || p.codeExecutionResult != null) {
+        return { ok: false, error: 'Code execution in chat is not supported' };
+      }
+      if (p.inlineData != null) {
+        return { ok: false, error: 'Image or file attachments are not supported' };
+      }
+      if (p.text == null) {
+        return { ok: false, error: 'Only text message parts are supported' };
+      }
+      let t = String(p.text);
+      if (t.length > MAX_TEXT_CHARS_PER_PART) {
+        t = t.slice(0, MAX_TEXT_CHARS_PER_PART);
+      }
+      if (t.length === 0) {
+        return { ok: false, error: 'Text parts may not be empty' };
+      }
+      newParts.push({ text: t });
+    }
+    if (newParts.length === 0) {
+      return { ok: false, error: 'Message has no text parts' };
+    }
+    out.push({ role, parts: newParts });
+  }
+  if (out.length === 0) {
+    return { ok: false, error: 'No messages in "contents"' };
+  }
+  return { ok: true, contents: out };
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -158,13 +235,24 @@ export default {
         });
       }
       const body = JSON.parse(new TextDecoder().decode(buf));
+      if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        return new Response(JSON.stringify({ error: 'Request body must be a JSON object' }), {
+          status: 400,
+          headers: jsonHeaders(request),
+        });
+      }
 
       const requested = typeof body.model === 'string' ? body.model.trim() : '';
       const model = ALLOWED_GEMINI_MODELS.has(requested) ? requested : GEMINI_MODEL_DEFAULT;
-      delete body.model;
 
-      delete body.system_instruction;
-      delete body.systemInstruction;
+      const rawContents = body.contents;
+      const sanitized = sanitizeContentsForGemini(rawContents);
+      if (!sanitized.ok) {
+        return new Response(JSON.stringify({ error: sanitized.error || 'Invalid contents' }), {
+          status: 400,
+          headers: jsonHeaders(request),
+        });
+      }
 
       let systemText;
       try {
@@ -176,16 +264,22 @@ export default {
         });
       }
 
-      body.system_instruction = { parts: [{ text: systemText }] };
-
-      const prevGc = body.generationConfig && typeof body.generationConfig === 'object' && !Array.isArray(body.generationConfig) ? body.generationConfig : {};
-      body.generationConfig = { ...prevGc, temperature: 0.45 };
+      const geminiRequest = {
+        contents: sanitized.contents,
+        system_instruction: { parts: [{ text: systemText }] },
+        generationConfig: {
+          temperature: GEMINI_TEMPERATURE,
+          topP: GEMINI_TOP_P,
+          maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS,
+        },
+        safetySettings: DEFAULT_SAFETY_SETTINGS,
+      };
 
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(geminiRequest),
       });
       const data = await res.json();
 
