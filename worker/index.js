@@ -187,6 +187,68 @@ function sanitizeContentsForGemini(raw) {
   return { ok: true, contents: out };
 }
 
+const OUT_OF_SCOPE_REFUSAL =
+  "I can only help with what is in Fred's published site context, not with that. For anything else, reach him at frederik.niesner@gmail.com.";
+
+/** Same shape as Gemini `generateContent` so the site JS parses the reply unchanged. */
+function geminiTextResponseBody(text) {
+  return {
+    candidates: [
+      {
+        content: { role: 'model', parts: [{ text }] },
+        finishReason: 'STOP',
+        index: 0,
+      },
+    ],
+  };
+}
+
+/**
+ * Heuristic: block before KV + API when the *latest user* turn is clearly not about Fred's profile.
+ * Tuned to catch weather, live facts, code homework, and jailbreaks; avoids blocking normal CV questions.
+ * @param {string} t
+ * @returns {boolean}
+ */
+function isLikelyOutOfScope(t) {
+  if (!t || typeof t !== 'string') return false;
+  const s = t.toLowerCase();
+  if (s.length < 2) return false;
+  if (s.length > 6_000) return false;
+  if (s.includes('frederikniesner.com') && s.length < 80) return false;
+
+  const tests = [
+    /\b(weather|forecast|will it (rain|snow)|doppler|thunderstorm|meteorolog|barometric|air quality index|aqi|uv index)\b/,
+    /\b(precipitation|humidity).{0,40}\b(forecast|tomorrow|today|week)\b/,
+    /\b(temperature|high of|low of).{0,20}(°|deg|degrees|celsius|fahrenheit|today|tomorrow|this week|°c|°f)\b/,
+    /^.{0,80}\b(what|how).{0,20}(weather|rain|sunny|cloud|celsius|fahrenheit|forecast|temperature)\b/,
+    /\b(stock price|day trading|s&p 500|nasdaq|bitcoin|ethereum|crypto( currency)?)\b/,
+    /\b(breaking news|headline today|latest news|what happened in the news)\b/,
+    /\b(who (won|wins) the|final score|super bowl|world cup|champions league) (in |of )?20[0-9]{2}/,
+    /\b(ignore|disregard)\s+(all\s+)?(previous|earlier|prior|the above)\s+instructions/,
+    /\b(reveal|print|leak|show|output)\s+.{0,25}(system\s*(prompt|instruction)|hidden\s*instruction)/i,
+    /^(repeat|return)\s+.{0,20}(the\s+)?(first|all|entire|full)\s+.{0,15}(line|message|text)/i,
+    /\b(dan mode|jailbreak|in developer mode)\b/,
+    /\b(write|create|generate|debug)\s+.{0,20}(a |an |me )?((a )?python|javascript|java |my code|a function|a script|a program|hello world|regex|sql query)\b/,
+    /^\s*what( is| are)\s+(\d+|\d+\s*[+\-*/]\s*\d+|\d+\s*divided)/,
+    /^\s*(compute|calculate|what's)\s+.{0,30}\d+.{0,5}[+\-*/%]/,
+    /\b(what|who) (is|are) the (capital|population) of \b/,
+  ];
+  return tests.some((re) => re.test(s));
+}
+
+/**
+ * @param {object[]} contents
+ * @returns {string}
+ */
+function getLastUserMessageText(contents) {
+  for (let i = contents.length - 1; i >= 0; i -= 1) {
+    if (contents[i].role === 'user') {
+      return contents[i].parts.map((p) => p.text).join('\n');
+    }
+  }
+  return '';
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -263,6 +325,14 @@ export default {
       if (!sanitized.ok) {
         return new Response(JSON.stringify({ error: sanitized.error || 'Invalid contents' }), {
           status: 400,
+          headers: jsonHeaders(request),
+        });
+      }
+
+      const lastUser = getLastUserMessageText(sanitized.contents);
+      if (isLikelyOutOfScope(lastUser)) {
+        return new Response(JSON.stringify(geminiTextResponseBody(OUT_OF_SCOPE_REFUSAL)), {
+          status: 200,
           headers: jsonHeaders(request),
         });
       }
