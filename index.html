@@ -13,7 +13,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="styles.css?v=28" type="text/css" media="all" />
+		<link rel="stylesheet" href="styles.css?v=29" type="text/css" media="all" />
 	</head>
 	<body data-mode="classic">
 		<script>
@@ -52,15 +52,12 @@
 				<div class="ai-content" aria-hidden="true">
 					<div class="ai-prompt-window">
 						<div class="ai-prompt-header">
-							<div class="ai-prompt-header-inner">
-								<span class="ai-prompt-placeholder">Fred — background &amp; projects</span>
-								<span class="ai-prompt-brand" aria-hidden="true">✦</span>
-							</div>
-							<p class="ai-scope-hint">Answers from Fred’s site context only — not open-web search, coding help, or other topics. Use the email link in Classic mode for anything else.</p>
+							<span class="ai-prompt-placeholder">Ask Fred anything</span>
+							<span class="ai-prompt-brand" aria-hidden="true">✦</span>
 						</div>
 						<div id="ai-conversation" class="ai-conversation"></div>
 						<form id="ai-form" class="ai-prompt-body">
-							<textarea id="ai-input" class="ai-prompt-input" name="question" placeholder="Ask about experience, skills, or projects in the context…" rows="3" maxlength="12000" autocomplete="off"></textarea>
+							<textarea id="ai-input" class="ai-prompt-input" name="question" placeholder="Type your message…" rows="3" maxlength="12000" autocomplete="off"></textarea>
 							<div class="ai-prompt-footer">
 								<button type="button" id="ai-submit" class="ai-prompt-btn ai-prompt-send" aria-label="Send question">Send</button>
 								<label class="ai-prompt-model-wrap">

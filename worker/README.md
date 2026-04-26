@@ -6,7 +6,7 @@ It also **injects the system instruction**: the browser sends only `contents` (c
 
 ## Request limits (Worker)
 
-The proxy does **not** pass through arbitrary Gemini fields. The browser may send `model` and `contents` (text only). The Worker enforces: **CORS** allowlist, optional **rate limits** (if KV is bound), **max body 96 KB**, at most **20** chat messages, **12 000** characters per text part, and server-defined **`generationConfig`** and **`safetySettings`**. Sync client defaults with [`worker/index.js`](../worker/index.js) (constants at top).
+The proxy does **not** pass through arbitrary Gemini fields. The browser may send `model` and `contents` (text only). The Worker enforces: **CORS** allowlist, optional **rate limits** (if KV is bound), **max body 96 KB**, at most **20** chat messages, **12 000** characters per text part, and server-defined **`generationConfig`** and **`safetySettings`**. A short **`SYSTEM_SCOPE_PREFIX`** is always prepended to the KV text (not overridable from the site) so profile-only and no-weather / no–real-time data rules always apply. Sync client defaults with [`worker/index.js`](../worker/index.js) (constants at top).
 
 ## AI context (required: Workers KV)
 

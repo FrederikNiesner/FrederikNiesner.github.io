@@ -26,10 +26,19 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemi
 
 /** Aligned with worker/index.js */
 const GEN_CONFIG = {
-  temperature: 0.45,
+  temperature: 0.25,
   topP: 0.95,
   maxOutputTokens: 1024,
 };
+
+/** Must match worker/index.js `SYSTEM_SCOPE_PREFIX` so eval behavior matches production. */
+const SYSTEM_SCOPE_PREFIX = `[SCOPE — MUST FOLLOW]
+You have no internet access, no tools, and no real-time or location data. You cannot know current or future weather, news, live sports, stock prices, or any fact not written in the CONTEXT block below.
+If the user asks for weather, forecasts, "tomorrow's" conditions, news, general trivia, coding homework, or anything not answerable *only* from the CONTEXT, refuse in one or two short sentences. Do not invent plausible-sounding details (e.g. never fabricate a weather report or typical seasonal filler as if it were a forecast). For out-of-scope questions, direct them to frederik.niesner@gmail.com.
+Only answer questions about Frederik ("Fred") Niesner’s professional background, skills, projects, and education *as they appear* in the CONTEXT.
+---
+
+`;
 
 const SAFETY_SETTINGS = [
   { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
@@ -70,6 +79,11 @@ const REFUSAL_MARKERS = [
   'not mentioned',
   'unclear from',
   'not included',
+  'no internet',
+  "don't have access",
+  'no access to',
+  'real-time',
+  'not something i can',
 ];
 
 const testCases = [
@@ -89,10 +103,15 @@ const testCases = [
   { q: 'What is 384 divided by 12?', kind: 'refusal' },
   { q: 'Who is the current Prime Minister of the United Kingdom?', kind: 'refusal' },
   { q: "What is Fred's favorite color?", kind: 'refusal' },
+  { q: 'What is the weather forecast for Hamburg tomorrow?', kind: 'refusal' },
 ];
 
 function loadSystemPrompt() {
   return readFileSync(CONTEXT_PATH, 'utf-8');
+}
+
+function buildFullSystemPrompt() {
+  return `${SYSTEM_SCOPE_PREFIX}${loadSystemPrompt()}`;
 }
 
 async function askGemini(question, systemPrompt) {
@@ -141,7 +160,7 @@ async function runEvals() {
     process.exit(1);
   }
 
-  const systemPrompt = loadSystemPrompt();
+  const systemPrompt = buildFullSystemPrompt();
   const results = [];
   let passed = 0;
   const n = testCases.length;

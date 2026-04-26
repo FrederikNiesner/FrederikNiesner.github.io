@@ -26,8 +26,21 @@ const MAX_CONTENT_MESSAGES = 20;
 const MAX_TEXT_CHARS_PER_PART = 12_000;
 
 const GEMINI_MAX_OUTPUT_TOKENS = 1024;
-const GEMINI_TEMPERATURE = 0.45;
+/** Low variance so scope rules and refusals stay consistent. */
+const GEMINI_TEMPERATURE = 0.25;
 const GEMINI_TOP_P = 0.95;
+
+/**
+ * Prepended to KV on every request (not client-controlled). Binds model to profile-only
+ * answers: no web, no real-time/weather, no plausibly invented “forecasts.”
+ */
+const SYSTEM_SCOPE_PREFIX = `[SCOPE — MUST FOLLOW]
+You have no internet access, no tools, and no real-time or location data. You cannot know current or future weather, news, live sports, stock prices, or any fact not written in the CONTEXT block below.
+If the user asks for weather, forecasts, \"tomorrow's\" conditions, news, general trivia, coding homework, or anything not answerable *only* from the CONTEXT, refuse in one or two short sentences. Do not invent plausible-sounding details (e.g. never fabricate a weather report or typical seasonal filler as if it were a forecast). For out-of-scope questions, direct them to frederik.niesner@gmail.com.
+Only answer questions about Frederik ("Fred") Niesner’s professional background, skills, projects, and education *as they appear* in the CONTEXT.
+---
+
+`;
 
 const DEFAULT_SAFETY_SETTINGS = [
   { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
@@ -256,7 +269,8 @@ export default {
 
       let systemText;
       try {
-        systemText = await loadSystemInstructionText(env);
+        const kvText = await loadSystemInstructionText(env);
+        systemText = `${SYSTEM_SCOPE_PREFIX}${kvText}`;
       } catch (ctxErr) {
         return new Response(JSON.stringify({ error: ctxErr.message || 'Context not available' }), {
           status: 503,
